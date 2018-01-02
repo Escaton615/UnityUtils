@@ -32,7 +32,7 @@ Shader "CQ/Decal"
 			struct v2f
 			{
 				float4 vertex : SV_POSITION;
-				float4 scrpos : TEXCOORD0;
+				float4 clippos : TEXCOORD0;
 				float3 viewspace : TEXCOORD1;
 			};
 
@@ -45,29 +45,30 @@ Shader "CQ/Decal"
 				v2f o;
 				o.viewspace = UnityObjectToViewPos(v.vertex);
 				o.vertex = UnityObjectToClipPos(v.vertex);
-				o.scrpos = UnityObjectToClipPos(v.vertex);
+				o.clippos = UnityObjectToClipPos(v.vertex);
 				return o;
 			}
 			
 			fixed4 frag (v2f i) : SV_Target
 			{
 				// screen position to depth tex uv
-				float2 duv = i.scrpos.xy / i.scrpos.w;
-				duv = float2((1 + duv.x) / 2, (1 - duv.y) / 2);
+				float2 screenpos = i.clippos.xy / i.clippos.w;
+				float2 dtexuv = float2((1 + screenpos.x) / 2, (1 - screenpos.y) / 2);
 
 				// fetch depth
 				float3 viewRay = i.viewspace.xyz / i.viewspace.z;
-				float d = LinearEyeDepth(tex2D(_CameraDepthTexture, duv));
+				float depth = LinearEyeDepth(tex2D(_CameraDepthTexture, dtexuv));
 
 				//get on screen buffer world position
-				float3 viewPos = viewRay * d;
-				float4 worldpos = mul(unity_CameraToWorld, float4(-viewPos.x, -viewPos.y, viewPos.z, 1));		
+				float3 tgtviewpos = viewRay * depth;
+				float4 tgtworldpos = mul(unity_CameraToWorld, float4(-tgtviewpos.x, -tgtviewpos.y, tgtviewpos.z, 1));		
 				
 				//transform to decal projector obj space to check clip
-				float3 objpos = mul(unity_WorldToObject, worldpos);
+				float3 objpos = mul(unity_WorldToObject, tgtworldpos);
 				clip(0.5 - abs(objpos.xyz));
 
 				//not clipped: sample texture based on object position
+				//  uv determined only by objpos
 				float2 uv = objpos.xy + 0.5;
 				fixed4 col = tex2D(_MainTex, uv * _MainTex_ST.xy + _MainTex_ST.zw );
 
