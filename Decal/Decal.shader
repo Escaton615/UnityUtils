@@ -44,8 +44,8 @@ Shader "CQ/Decal"
 			{
 				v2f o;
 				o.viewspace = UnityObjectToViewPos(v.vertex);
-				o.vertex = UnityObjectToClipPos(v.vertex);
 				o.clippos = UnityObjectToClipPos(v.vertex);
+				o.vertex = o.clippos;
 				return o;
 			}
 			
