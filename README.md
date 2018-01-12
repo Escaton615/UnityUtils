@@ -41,4 +41,10 @@ Image effect that draws outline according to zbuffer.
     
 > OutlineThreshold: pixel with zbuffer delta larger than threshold will be considered a outline pixel, thus rendered with OutlineColor.  
 
+## Image Dithering
+
+Clips pixels near camera based on dithering matrix. No alpha-channel needed.
+
+>TODO: optimizations.
+
 [Markdown Editor](https://stackedit.io/editor)
