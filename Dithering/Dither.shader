@@ -4,7 +4,7 @@
 	{
 		_MainTex ("Texture", 2D) = "white" {}
 		_DitherMap ("Texture", 2D) = "white" {}
-		_Threshold ("Discard Threshold", Range(0.0,1.0)) = 0.5
+		_Threshold ("Discard Threshold", Float) = 0.5
 	}
 	SubShader
 	{
@@ -62,7 +62,7 @@
 				duv.y = duv.y *8;
 				
 				float dval = tex2D(_DitherMap, duv).r;
-				float depth = 1 - i.clippos.z/i.clippos.w;
+				float depth = LinearEyeDepth(i.clippos.z/i.clippos.w) - 0.3;
 				clip(depth/_Threshold - dval);
 				
 				//col = fixed4(depth, depth, depth, 1);
