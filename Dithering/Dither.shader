@@ -5,6 +5,7 @@
 		_MainTex ("Texture", 2D) = "white" {}
 		_DitherMap ("Texture", 2D) = "white" {}
 		_Threshold ("Discard Threshold", Float) = 0.5
+		_DitherMapSize ("Dither Map Size", Float) = 32
 	}
 	SubShader
 	{
@@ -41,6 +42,7 @@
 			sampler2D_float _DitherMap;
 			float4 _DitherMap_ST;
 			float _Threshold;
+			float _DitherMapSize;
 			
 			v2f vert (appdata v)
 			{
@@ -56,10 +58,10 @@
 			{
 				// sample the texture
 				fixed4 col = tex2D(_MainTex, i.uv);
-				float2 duv = i.clippos.xy/i.clippos.w + float2(0.5, 0.5);
+				float2 duv = i.clippos.xy/i.clippos.w/2 + float2(0.5, 0.5);
 
-				duv.x = duv.x *8;
-				duv.y = duv.y *8;
+				duv.x = duv.x * _ScreenParams.x / _DitherMapSize;
+				duv.y = duv.y * _ScreenParams.y / _DitherMapSize;
 				
 				float dval = tex2D(_DitherMap, duv).r;
 				float depth = LinearEyeDepth(i.clippos.z/i.clippos.w) - 0.3;
