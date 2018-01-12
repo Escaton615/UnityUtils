@@ -56,13 +56,17 @@
 			{
 				// sample the texture
 				fixed4 col = tex2D(_MainTex, i.uv);
-				float2 duv = i.uv;//i.clippos.xy/i.clippos.w + float2(0.5, 0.5);
+				float2 duv = i.clippos.xy/i.clippos.w + float2(0.5, 0.5);
 
+				duv.x = duv.x *8;
+				duv.y = duv.y *8;
+				
 				float dval = tex2D(_DitherMap, duv).r;
-				float depth = i.clippos.z/i.clippos.w;
-				clip(dval - _Threshold);
-				// apply fog
-				// UNITY_APPLY_FOG(i.fogCoord, col);
+				float depth = 1 - i.clippos.z/i.clippos.w;
+				clip(depth/_Threshold - dval);
+				
+				//col = fixed4(depth, depth, depth, 1);
+
 				return col;
 			}
 			ENDCG
