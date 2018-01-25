@@ -20,13 +20,14 @@ public class Dithering : MonoBehaviour
         var finalmatrix = generateDitherMatrix(size);
         for (int i = 0; i < size; i++)
         {
+            var diff = 1f / size / size;
             for (int j = 0; j < size; j++)
             {
                 var c = finalmatrix[i * size + j];
-                ditherMap.SetPixel(i,j,new Color(c,0,0));
+
+                ditherMap.SetPixel(i, j, new Color(c + diff, 0, 0));
                 ditherMap.filterMode = FilterMode.Point;
                 ditherMap.Apply();
-                Debug.Log(finalmatrix[i * size + j]* size * size) ;
             }
         }
         GetComponent<Renderer>().material.SetTexture("_DitherMap", ditherMap);
